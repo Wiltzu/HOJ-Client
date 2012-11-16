@@ -7,11 +7,11 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class WorkHandler implements Runnable {
+public class SumServerHandler implements Runnable {
 	
 	private Socket socket;
 	
-	public WorkHandler (Socket s) {
+	public SumServerHandler (Socket s) {
 		this.socket = s;
 	}
 
@@ -21,7 +21,7 @@ public class WorkHandler implements Runnable {
 		OutputStream os;
 		ObjectInputStream ois;
 		ObjectOutputStream oos;
-		int numberOfPorts = 0;
+		int numberOfAddingServers = 0;
 		
 		try {
 			is = socket.getInputStream();
@@ -29,12 +29,13 @@ public class WorkHandler implements Runnable {
 			ois = new ObjectInputStream(is);
 			oos = new ObjectOutputStream(os);
 			
-			numberOfPorts = ois.readInt();
+			numberOfAddingServers = ois.readInt();
 			
-			if(numberOfPorts != 0) {
-				createAddingServers(numberOfPorts);
+			if(numberOfAddingServers != 0) {
+				createAddingServers(numberOfAddingServers);
 			}
 			else {
+				oos.writeInt(-1);
 				System.exit(0);
 			}
 			
