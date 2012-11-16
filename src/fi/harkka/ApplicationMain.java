@@ -31,8 +31,7 @@ public class ApplicationMain implements Runnable {
 	
 	public static void main(String[] args) { 
 		
-		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
-		executor.execute(new ApplicationMain());
+		new Thread(new ApplicationMain()).start();
 		
 	}
 
@@ -69,36 +68,39 @@ public class ApplicationMain implements Runnable {
 
 	@Override
 	public void run() {
-		boolean UDPSuccess = sendUDPPackage();
+		boolean UDPSendSuccess = sendUDPPackage();
 		ServerSocket serverSocket;
+		Socket socket = null;
 		
-		boolean success = false;
-		int counter = 1;
+		boolean TCPSuccess = false;
+		int UDPSendCounter = 1;
 		
-		while(!success ) {
-			if(counter > 4) break;
-			if(UDPSuccess) {
+		while(TCPSuccess != true) {
+			if(UDPSendCounter > 4) break;
+			if(UDPSendSuccess) {
 				
 				
 					try {
 						serverSocket = new ServerSocket(ApplicationMain.OWNPORT);
 						serverSocket.setSoTimeout(TIMEOUT);
-						Socket socket = serverSocket.accept();
+						socket = serverSocket.accept();
+						TCPSuccess = true;
 						System.out.println("kokeile");
-						InputStream is = socket.getInputStream();
-						OutputStream os = socket.getOutputStream();
-						ObjectInputStream ois = new ObjectInputStream(is);
-						ObjectOutputStream oos = new ObjectOutputStream(os);
 						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
+						UDPSendSuccess = false;
 						continue;
 					}
 			}
 			else {
-				sendUDPPackage();
+				UDPSendSuccess = sendUDPPackage();
+				UDPSendCounter++;
 			}
-			counter++;
+		}
+		
+		if(socket != null) {
+			new Thread(new Worker(socket)).start();
 		}
 		
 	}
