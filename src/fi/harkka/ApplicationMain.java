@@ -1,12 +1,17 @@
 package fi.harkka;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +25,9 @@ public class ApplicationMain implements Runnable {
 	
 	private static final int OWNPORT = 3127;
 	private static final int NTHREADS = 5;
+	private static final int TIMEOUT = 5000;
+	
+	
 	
 	public static void main(String[] args) { 
 		
@@ -40,6 +48,7 @@ public class ApplicationMain implements Runnable {
 			packet = new DatagramPacket(buf, buf.length, laddr, SERVERPORT); 
 			socket = new DatagramSocket();
 			socket.send(packet);
+			socket.close();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return false;
@@ -60,20 +69,37 @@ public class ApplicationMain implements Runnable {
 
 	@Override
 	public void run() {
-		boolean success = sendUDPPackage();
+		boolean UDPSuccess = sendUDPPackage();
 		ServerSocket serverSocket;
 		
-		if(success) {
-			try {
-				serverSocket = new ServerSocket(ApplicationMain.OWNPORT);
-				Socket socket = serverSocket.accept();
+		boolean success = false;
+		int counter = 1;
+		
+		while(!success ) {
+			if(counter > 4) break;
+			if(UDPSuccess) {
 				
-				socket.getInputStream();
-				socket.getOutputStream();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
+					try {
+						serverSocket = new ServerSocket(ApplicationMain.OWNPORT);
+						serverSocket.setSoTimeout(TIMEOUT);
+						Socket socket = serverSocket.accept();
+						System.out.println("kokeile");
+						InputStream is = socket.getInputStream();
+						OutputStream os = socket.getOutputStream();
+						ObjectInputStream ois = new ObjectInputStream(is);
+						ObjectOutputStream oos = new ObjectOutputStream(os);
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						continue;
+					}
 			}
+			else {
+				sendUDPPackage();
+			}
+			counter++;
 		}
+		
 	}
 }
