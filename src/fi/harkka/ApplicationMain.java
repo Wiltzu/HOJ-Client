@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-
+//Kokeilu kommentti
 public class ApplicationMain implements Runnable {
 	
 	private static final int SERVERPORT = 3126;
