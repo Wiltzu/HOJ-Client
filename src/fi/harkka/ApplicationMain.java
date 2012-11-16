@@ -4,37 +4,36 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-//Kokeilu kommentti
+//K
 public class ApplicationMain implements Runnable {
 	
 	private static final int SERVERPORT = 3126;
 	private static final String SERVERADDRESS = "localhost";
 	
-	private static final String STARTMESSAGE = "3150";
+	private static final int OWNPORT = 3127;
 	private static final int NTHREADS = 5;
 	
-	public static void main(String[] args) {
-		sendUDPPackage();
+	public static void main(String[] args) { 
+		
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
-		for(int i = 0; i < 11; i++) {
-			executor.execute(new ApplicationMain());
-		}
+		executor.execute(new ApplicationMain());
 		
 	}
 
-	private static void sendUDPPackage() {
+	private boolean sendUDPPackage() {
 		InetAddress laddr;
 		DatagramSocket socket;
 		DatagramPacket packet;
 		
-		byte[] buf = STARTMESSAGE.getBytes();
+		byte[] buf = Integer.toString(OWNPORT).getBytes();
 		
 		try {
 			laddr = InetAddress.getByName(SERVERADDRESS);
@@ -43,27 +42,36 @@ public class ApplicationMain implements Runnable {
 			socket.send(packet);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+			return false;
 		}
 		  catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		  catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return false;
 		}
+		return true;
 		
 	}
 
 	@Override
 	public void run() {
-		int a = new Random().nextInt(10);
+		boolean success = sendUDPPackage();
+		ServerSocket serverSocket;
 		
-		while(a < 20) {
-			System.out.println(++a);
+		if(success) {
 			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
+				serverSocket = new ServerSocket(ApplicationMain.OWNPORT);
+				Socket socket = serverSocket.accept();
+				
+				socket.getInputStream();
+				socket.getOutputStream();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
