@@ -7,11 +7,11 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class Worker implements Runnable {
+public class WorkHandler implements Runnable {
 	
 	private Socket socket;
 	
-	public Worker (Socket s) {
+	public WorkHandler (Socket s) {
 		this.socket = s;
 	}
 
@@ -21,7 +21,7 @@ public class Worker implements Runnable {
 		OutputStream os;
 		ObjectInputStream ois;
 		ObjectOutputStream oos;
-		int numberOfPorts;
+		int numberOfPorts = 0;
 		
 		try {
 			is = socket.getInputStream();
@@ -31,12 +31,25 @@ public class Worker implements Runnable {
 			
 			numberOfPorts = ois.readInt();
 			
+			if(numberOfPorts != 0) {
+				createAddingServers(numberOfPorts);
+			}
+			else {
+				System.exit(0);
+			}
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 
+	}
+
+	private void createAddingServers(int numOfPorts) {
+		
+		
 	}
 
 }

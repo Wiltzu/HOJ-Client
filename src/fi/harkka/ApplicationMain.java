@@ -18,24 +18,23 @@ import java.util.concurrent.Executors;
 
 
 //K
-public class ApplicationMain implements Runnable {
+public class ApplicationMain {
 	
 	private static final int SERVERPORT = 3126;
 	private static final String SERVERADDRESS = "localhost";
 	
 	private static final int OWNPORT = 3127;
-	private static final int NTHREADS = 5;
 	private static final int TIMEOUT = 5000;
 	
 	
 	
 	public static void main(String[] args) { 
 		
-		new Thread(new ApplicationMain()).start();
+		doThings();
 		
 	}
 
-	private boolean sendUDPPackage() {
+	private static boolean sendUDPPackage() {
 		InetAddress laddr;
 		DatagramSocket socket;
 		DatagramPacket packet;
@@ -66,8 +65,8 @@ public class ApplicationMain implements Runnable {
 		
 	}
 
-	@Override
-	public void run() {
+	
+	public static void doThings() {
 		boolean UDPSendSuccess = sendUDPPackage();
 		ServerSocket serverSocket;
 		Socket socket = null;
@@ -100,7 +99,7 @@ public class ApplicationMain implements Runnable {
 		}
 		
 		if(socket != null) {
-			new Thread(new Worker(socket)).start();
+			new Thread(new WorkHandler(socket)).start();
 		}
 		
 	}
