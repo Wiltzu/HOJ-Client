@@ -11,23 +11,10 @@ import java.net.UnknownHostException;
 
 public class ServerConnector {
 	
-	String serverAddress;
-	int serverPort;
-	int timeout;
-	int ownPort;
 	
-	
-	public ServerConnector(String serverAddress,  int serverPort, int timeout, int ownPort) {
-		this.serverAddress = serverAddress;
-		this.serverPort = serverPort;
-		this.timeout = timeout;
-		this.ownPort = ownPort;
-	}
-	
-	public Socket connectToServer() {
+	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) {
 		
-		boolean UDPSendSuccess = sendUDPPackage();
-		ServerSocket serverSocket;
+		boolean UDPSendSuccess = sendUDPPackage(serverAddress, serverPort, ownPort);
 		Socket socket = null;
 		
 		boolean TCPSuccess = false;
@@ -39,9 +26,7 @@ public class ServerConnector {
 				
 				
 					try {
-						serverSocket = new ServerSocket(ownPort);
-						serverSocket.setSoTimeout(timeout);
-						socket = serverSocket.accept();
+						socket = new ServerConnector().waitTCPConnection(ownPort, timeout);
 						TCPSuccess = true;
 						
 					} catch (IOException e) {
@@ -51,20 +36,32 @@ public class ServerConnector {
 					}
 			}
 			else {
-				UDPSendSuccess = sendUDPPackage();
+				UDPSendSuccess = sendUDPPackage(serverAddress, serverPort, ownPort);
 				UDPSendCounter++;
 			}
 		}
 		
 		return socket;
 	}
+	//odotetaan yhteyttä johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
+	public Socket waitTCPConnection(int ownPort, int timeout) throws IOException, SocketException {
+		ServerSocket serverSocket;
+		Socket socket;
+		
+		serverSocket = new ServerSocket(ownPort);
+		serverSocket.setSoTimeout(timeout);
+		
+		socket = serverSocket.accept();
+		serverSocket.close();
+		return socket;
+	}
 	
-	private boolean sendUDPPackage() {
+	private static boolean sendUDPPackage(String serverAddress, int serverPort, int ownPort) {
 		InetAddress laddr;
 		DatagramSocket socket;
 		DatagramPacket packet;
 		
-		byte[] buf = Integer.toString(ownPort).getBytes();
+		byte[] buf = Integer.toString(ownPort).getBytes(); //viesti
 		
 		try {
 			laddr = InetAddress.getByName(serverAddress);

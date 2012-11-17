@@ -16,8 +16,7 @@ public class ApplicationMain {
 	
 	public static void main(String[] args) { 
 		
-		ServerConnector connector = new ServerConnector(SERVERADDRESS, SERVERPORT, TIMEOUT, OWNPORT);
-		Socket connection = connector.connectToServer();
+		Socket connection = ServerConnector.connectToServer(SERVERADDRESS, SERVERPORT, TIMEOUT, OWNPORT);
 		new Thread(new SumServerHandler(connection)).start();
 		
 	}
