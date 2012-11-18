@@ -1,6 +1,10 @@
 package fi.harkka;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,7 +13,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class ServerConnector {
+public class ServerConnectorHelper {
 	
 	
 	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) {
@@ -26,7 +30,7 @@ public class ServerConnector {
 				
 				
 					try {
-						socket = new ServerConnector().waitTCPConnection(ownPort, timeout);
+						socket = new ServerConnectorHelper().waitTCPConnection(ownPort, timeout);
 						TCPSuccess = true;
 						
 					} catch (IOException e) {
@@ -54,6 +58,18 @@ public class ServerConnector {
 		socket = serverSocket.accept();
 		serverSocket.close();
 		return socket;
+	}
+	
+	//socketin ulosmenevä oliovirta
+	public ObjectOutputStream getSocketsObjectOutputStream(Socket socket) throws IOException {
+		OutputStream os = socket.getOutputStream();
+		return new ObjectOutputStream(os);
+	}
+	
+	//socketiin tuleva oliovirta
+	public ObjectInputStream getSocketsObjectInputStream(Socket socket) throws IOException {
+		InputStream is = socket.getInputStream();
+		return new ObjectInputStream(is);
 	}
 	
 	private static boolean sendUDPPackage(String serverAddress, int serverPort, int ownPort) {
