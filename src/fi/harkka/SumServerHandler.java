@@ -43,46 +43,16 @@ public class SumServerHandler implements Runnable, Observer {
 			numberOfSumServers = getNumberOfSumServers(oIn);
 			
 			if(numberOfSumServers != 0) { //jos summauspalvelinten m‰‰r‰ saatiin
-				int[] addingServerPorts = createSumServers(numberOfSumServers);
-				for(int i = 0; i < addingServerPorts.length; i++) {
-					oOut.writeInt(addingServerPorts[i]); //kirjoitetaan summauspalvelimien portit virtaan
-					oOut.flush();
-				}
+				int[] addingServerPorts = createSumServers(numberOfSumServers); //luodaan summauspalvelimet
+				sendSumServerPorts(addingServerPorts); //l‰hetet‰‰n porttinumerot
 				
-				int gottenTaskNumber = -1;
-				do {
-					try {
-						gottenTaskNumber = oIn.readInt();
-						if(gottenTaskNumber != 0){
-							doTask(gottenTaskNumber, oOut);
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						else
-							close();
-					}
-					catch (EOFException e) { //menee t‰nne jos ei ole mit‰‰n luettevaa
-							
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-								continue;
-					}
-				}
-				while(gottenTaskNumber != 0);
+				handleIncomingRequests();
 			}
 			else { //v‰litet‰‰n luku -1 palvelimelle, koska ei saatu summauspalvelujen m‰‰r‰‰
 				oOut.writeInt(-1); 
 				oOut.flush();
 				
-				close();
+				close(); //suljetaan
 			}
 			
 			
@@ -92,6 +62,46 @@ public class SumServerHandler implements Runnable, Observer {
 		}
 		
 		
+	}
+
+	private void handleIncomingRequests() throws IOException {
+		int gottenTaskNumber = -1; //alustetaan jollain luvulla, mik‰ ei ole nolla
+		do {
+			try {
+				gottenTaskNumber = oIn.readInt();
+				if(gottenTaskNumber != 0){
+					//jos ei ole saatu viel‰ yht‰‰n arvoa, annetaan vuoro toiselle s‰ikeelle
+					if(getCountOfGottenValues() == 0) Thread.yield(); 
+					else {
+						doTask(gottenTaskNumber, oOut);
+						Thread.sleep(100);
+					}
+				}
+				else //suljetaan, kun saadaan vastauksena 0
+					close();
+			}
+			catch (EOFException e) { //menee t‰nne jos ei ole mit‰‰n luettevaa
+					
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						continue;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		while(gottenTaskNumber != 0);
+	}
+
+	private void sendSumServerPorts(int[] sumServerPorts) throws IOException {
+		for(int i = 0; i < sumServerPorts.length; i++) {
+			oOut.writeInt(sumServerPorts[i]); //kirjoitetaan summauspalvelimien portit virtaan
+			oOut.flush();
+		}
 	}
 	
 	private void close() throws IOException {
@@ -113,7 +123,7 @@ public class SumServerHandler implements Runnable, Observer {
 		
 	}
 
-	private void setSumServerValue(int sumServersValue, int sumServersId) {
+	private synchronized void setSumServerValue(int sumServersValue, int sumServersId) {
 		sumServerValues[sumServersId] = sumServersValue; //asetetaan arvo listaan
 		
 		increaseCountOfGottenValues(); //kasvatetaan saatujen arvojen lukum‰‰r‰‰
