@@ -108,7 +108,10 @@ public class SumServerHandler implements Runnable, Observer {
 		oOut.close();
 		oIn.close();
 		socket.close();
-		System.exit(0);
+		/* vaaditaan, ellei korjaa WorkDistributoria niin, ett‰ se l‰hett‰‰ 
+		 * kaikille summauspalvelimille lopetusviestin.
+		 */
+		//System.exit(0); 
 	}
 
 	@Override
