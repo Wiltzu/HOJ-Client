@@ -11,12 +11,15 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+
+import fi.harkka.exception.ConnectionFailedException;
 
 public class ServerConnectorHelper {
 	
 	
-	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) {
+	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) throws ConnectionFailedException {
 		
 		boolean UDPSendSuccess = sendUDPPackage(serverAddress, serverPort, ownPort);
 		Socket socket = null;
@@ -24,19 +27,24 @@ public class ServerConnectorHelper {
 		boolean TCPSuccess = false;
 		int UDPSendCounter = 1;
 		
+		ServerConnectorHelper connectorHelper = new ServerConnectorHelper();
+		
 		while(TCPSuccess != true) {
-			if(UDPSendCounter > 4) break;
+			if(UDPSendCounter > 4) throw new ConnectionFailedException();
 			if(UDPSendSuccess) {
 				
 				
 					try {
-						socket = new ServerConnectorHelper().waitTCPConnection(ownPort, timeout);
-						TCPSuccess = true;
-						
+						System.out.println("Trying to make TCP connection");
+						socket = connectorHelper.waitTCPConnection(ownPort, timeout);
+						if(socket != null) //jos socketti saatiin lopetetaan silmukka
+							TCPSuccess = true;
+						else
+							UDPSendSuccess = false;
+					//ei saatu sockettia, UDP-paketti uusiksi!
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						UDPSendSuccess = false;
-						continue;
+						System.err.println("Something strange happened!");
 					}
 			}
 			else {
@@ -48,14 +56,19 @@ public class ServerConnectorHelper {
 		return socket;
 	}
 	//odotetaan yhteyttä johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
-	public Socket waitTCPConnection(int ownPort, int timeout) throws IOException, SocketException {
+	public Socket waitTCPConnection(int ownPort, int timeout) throws IOException {
 		ServerSocket serverSocket;
-		Socket socket;
+		Socket socket = null;
 		
 		serverSocket = new ServerSocket(ownPort);
 		serverSocket.setSoTimeout(timeout);
-		
-		socket = serverSocket.accept();
+		try {
+			socket = serverSocket.accept();
+		}
+		catch (SocketTimeoutException e) {
+			serverSocket.close();
+			System.err.println("TimeOut while making TCP connection");
+		}
 		serverSocket.close();
 		return socket;
 	}
@@ -90,12 +103,10 @@ public class ServerConnectorHelper {
 			return false;
 		}
 		  catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
 		  catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
 		}
