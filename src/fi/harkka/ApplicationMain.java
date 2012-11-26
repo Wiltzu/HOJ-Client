@@ -8,7 +8,10 @@ import fi.harkka.exception.ConnectionFailedException;
 
 /**
  * @author Ville
+ * @author Aleksi
+ * @author Johannes
  *
+ * P‰‰luokka, jossa main-metodi.
  */
 public class ApplicationMain {
 	

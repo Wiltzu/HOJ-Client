@@ -11,11 +11,8 @@ import java.util.Observer;
 
 /**
  * @author Ville
- *
- */
-/**
- * @author Ville
- *
+ * 
+ * <p>Luokka hallitsee summauspalvelimia ja ylläpitää yhteyttä palvelimen Y kanssa.</p>
  */
 public class SumServerHandler implements Runnable, Observer {
 
@@ -31,8 +28,11 @@ public class SumServerHandler implements Runnable, Observer {
 	
 	private static final int[] PORT_NUMBERS = {3128, 3129, 3130, 3131, 3132, 3133, 3134, 3135, 3136, 3137}; 
 	
-	public SumServerHandler (Socket s) {
-		this.socket = s;
+	/**
+	 * @param socket, jolla yhteys palvelimeen Y.
+	 */
+	public SumServerHandler (Socket socket) {
+		this.socket = socket;
 		this.countOfGottenValues = 0;
 		this.sumServersTotalValue = 0;
 	}
@@ -73,6 +73,7 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 
 	/**
+	 * <p>Metodi hallitsee palvelimelta Y tulevat pyynnöt.</p>
 	 * @throws IOException
 	 */
 	private void handleIncomingRequests() throws IOException {
@@ -109,6 +110,7 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 
 	/**
+	 * 	<p>Lähettää summauspalvelinten portti numerot palvelimelle Y.</p>
 	 * @param sumServerPorts
 	 * @throws IOException
 	 */
@@ -120,6 +122,7 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 	
 	/**
+	 * <p>Sulkee oliovirrat ja socket-yhteyden palvelimeen Y.</p>
 	 * @throws IOException
 	 */
 	private void close() throws IOException {

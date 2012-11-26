@@ -10,17 +10,17 @@ public interface ISumServer extends Runnable {
 	
 	
 	/**
-	 * @return
+	 * @return Summauspalvelimen portin.
 	 */
 	int getPort();
 	
 	/**
-	 * @return
+	 * @return Summauspalvelimen summa.
 	 */
 	int getSum();
 	
 	/**
-	 * @return
+	 * @return Summauspalvelimen tunnus.
 	 */
 	int getId();
 	
