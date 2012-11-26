@@ -11,10 +11,12 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- * @author Ville
+ * @author Ville Ahti
+ * @author Johannes Miettinen
+ * @author Aleksi Haapsaari
  * 
  *         <p>
- *         Luokka hallitsee summauspalvelimia ja yll�pit�� yhteytt� palvelimen Y
+ *         Luokka hallitsee summauspalvelimia ja ylläpitää yhteyttä palvelimen Y
  *         kanssa.
  *         </p>
  */
@@ -34,8 +36,9 @@ public class SumServerHandler implements Runnable, Observer {
 			3133, 3134, 3135, 3136, 3137 };
 
 	/**
-	 * @param socket
-	 *            , jolla yhteys palvelimeen Y.
+	 * <p>Konstruktori, jolle annetaan socket-yhteys palvelimelle Y.</p>
+	 * @param socket (yhteys palvelimeen Y)
+	 *             
 	 */
 	public SumServerHandler(Socket socket) {
 		this.socket = socket;
@@ -81,7 +84,7 @@ public class SumServerHandler implements Runnable, Observer {
 
 	/**
 	 * <p>
-	 * Metodi hallitsee palvelimelta Y tulevat pyynn�t.
+	 * Metodi hallitsee palvelimelta Y tulevat pyynnöt.
 	 * </p>
 	 * 
 	 * @throws IOException
@@ -121,7 +124,7 @@ public class SumServerHandler implements Runnable, Observer {
 
 	/**
 	 * <p>
-	 * L�hett�� summauspalvelinten portti numerot palvelimelle Y.
+	 * Lähettää summauspalvelinten portti numerot palvelimelle Y.
 	 * </p>
 	 * 
 	 * @param sumServerPorts
@@ -153,6 +156,9 @@ public class SumServerHandler implements Runnable, Observer {
 		// System.exit(0);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		SumServer ss = (SumServer) o;
@@ -167,8 +173,10 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 
 	/**
-	 * @param sumServersValue
-	 * @param sumServersId
+	 * <p>Asettaa summauspalvelimen arvon.</p>
+	 * 
+	 * @param sumServersValue (summauspalvelimen arvo)
+	 * @param sumServersId (summauspalvelimen tunnus)
 	 */
 	private synchronized void setSumServerValue(int sumServersValue,
 			int sumServersId) {
@@ -180,14 +188,14 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 
 	/**
-	 * 
+	 * <p>Kasvattaa summauspalvelimilta saatujen arvojen määrää.</p>
 	 */
 	private synchronized void increaseCountOfGottenValues() {
 		countOfGottenValues++;
 	}
 
 	/**
-	 * @return
+	 * @return Saatujen arvojen määrä
 	 */
 	public int getCountOfGottenValues() {
 		if (verboseMode)
@@ -197,7 +205,7 @@ public class SumServerHandler implements Runnable, Observer {
 	}
 
 	/**
-	 * @return
+	 * @return Summauspalvelinten yhteisarvo.
 	 */
 	public int getSumServersTotalValue() {
 		sumServersTotalValue = 0;
@@ -213,6 +221,8 @@ public class SumServerHandler implements Runnable, Observer {
 	 * @param taskNumber
 	 * @param oOut
 	 * @throws IOException
+	 * 
+	 * <p>Suorittaa palvelimen Y antamia tehtäviä.</p>
 	 */
 	private synchronized void doTask(int taskNumber, ObjectOutputStream oOut)
 			throws IOException {
@@ -239,12 +249,14 @@ public class SumServerHandler implements Runnable, Observer {
 		}
 	}
 
+	/**
+	 *	<p>Sulkee summauspalvelinten yhteydet.</p> 
+	 */
 	private void killSumServers() {
 		for (ISumServer sum : listOfSumServers) {
 			try {
 				sum.kill();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
