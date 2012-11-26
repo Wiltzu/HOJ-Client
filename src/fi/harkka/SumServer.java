@@ -19,7 +19,8 @@ public class SumServer extends Observable implements ISumServer {
 	private volatile int sum;
 	private int port;
 	private int id;
-	
+	private ObjectInputStream oIn;
+	private Socket socket;
 	
 	/**
 	 * @param id
@@ -30,7 +31,9 @@ public class SumServer extends Observable implements ISumServer {
 		this.sum = 0;
 		this.id = id;
 		this.port = port;
-		this.addObserver(creator); //lisätään luoja (SumServerHandler) tarkkailijaksi
+		this.addObserver(creator); //lisï¿½tï¿½ï¿½n luoja (SumServerHandler) tarkkailijaksi
+
+		
 	}
 	
 	
@@ -57,14 +60,13 @@ public class SumServer extends Observable implements ISumServer {
 	public void run() {
 		try {
 			ServerConnectorHelper connectorHelper = new ServerConnectorHelper();
-			Socket socket = connectorHelper.waitTCPConnection(getPort(), 0);
-			ObjectInputStream oIn = connectorHelper.getSocketsObjectInputStream(socket);
+			this.socket = connectorHelper.waitTCPConnection(getPort(), 0);
+			this.oIn = connectorHelper.getSocketsObjectInputStream(socket);
 			
 			handleRequests(oIn);
 			
 			//suljetaan
-			oIn.close();
-			socket.close();
+			kill();
 			
 		
 		} catch (SocketException e) {
@@ -74,6 +76,12 @@ public class SumServer extends Observable implements ISumServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void kill() throws IOException {
+		oIn.close();
+		socket.close();
 	}
 	
 	
@@ -108,10 +116,10 @@ public class SumServer extends Observable implements ISumServer {
 	 * @param num
 	 */
 	private void increaseSum(int num) {
-		if(num == 0) return; //ei lisätä nollaa
+		if(num == 0) return; //ei lisï¿½tï¿½ nollaa
 		this.sum += num;
-		setChanged(); //observableen määritetään että tila muuttunut
-		notifyObservers(); //ilmoitetaan SumServerHandlerille, että tila on muuttunut
+		setChanged(); //observableen mï¿½ï¿½ritetï¿½ï¿½n ettï¿½ tila muuttunut
+		notifyObservers(); //ilmoitetaan SumServerHandlerille, ettï¿½ tila on muuttunut
 	}
 
 
