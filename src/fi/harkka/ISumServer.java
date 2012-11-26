@@ -3,7 +3,11 @@ package fi.harkka;
 import java.io.IOException;
 
 /**
- * @author Ville
+ * @author Ville Ahti
+ * @author Johannes Miettinen
+ * @author Aleksi Haapsaari
+ * 
+ * <p>Rajapinta Summauspalvelimille.</p>
  *
  */
 public interface ISumServer extends Runnable {
@@ -26,7 +30,7 @@ public interface ISumServer extends Runnable {
 	
 	
 	/**
-	 *
+	 * <p>Sulkee yhteydet.</p>
 	 */
 	void kill() throws IOException;
 }

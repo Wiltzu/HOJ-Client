@@ -7,11 +7,11 @@ import fi.harkka.exception.ConnectionFailedException;
 
 
 /**
- * @author Ville
- * @author Aleksi
- * @author Johannes
+ * @author Ville Ahti
+ * @author Aleksi Haapsaari
+ * @author Johannes Miettinen
  *
- * Main class with main method.
+ * <p>Pääluokka, jossa ohjelmaa ajetaan.</p>
  */
 public class ApplicationMain {
 	
