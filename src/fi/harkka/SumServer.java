@@ -17,6 +17,7 @@ import java.util.Observer;
 public class SumServer extends Observable implements ISumServer {
 	
 	private volatile int sum;
+	private volatile boolean connectionClosed;
 	private int port;
 	private int id;
 	private ObjectInputStream oIn;
@@ -32,7 +33,7 @@ public class SumServer extends Observable implements ISumServer {
 		this.id = id;
 		this.port = port;
 		this.addObserver(creator); //lis�t��n luoja (SumServerHandler) tarkkailijaksi
-
+		this.connectionClosed = false;
 		
 	}
 	
@@ -80,8 +81,12 @@ public class SumServer extends Observable implements ISumServer {
 
 	@Override
 	public void kill() throws IOException {
-		oIn.close();
-		socket.close();
+
+		if(!connectionClosed){
+			oIn.close();
+			socket.close();
+			this.connectionClosed = true;
+		}
 	}
 	
 	
@@ -91,7 +96,7 @@ public class SumServer extends Observable implements ISumServer {
 	 * @throws IOException
 	 */
 	private int handleRequests(ObjectInputStream oIn) throws IOException {
-		int gottenNumber = 1;
+		int gottenNumber;
 		try {
 			gottenNumber = oIn.readInt();
 			if(gottenNumber != 0) { //rekursiossa(silmukassa) niin kauan kunnes saadaan 0
@@ -106,7 +111,9 @@ public class SumServer extends Observable implements ISumServer {
 			}
 			
 		} catch (EOFException e) {
-			handleRequests(oIn);
+			if(!connectionClosed)
+				handleRequests(oIn);
+			else return 0;
 		}
 		
 		return 0;
