@@ -11,8 +11,11 @@ import java.util.Observer;
 
 
 /**
- * @author Ville Ahti, Johannes Miettinen, Aleksi Haapsaari
- *
+ * @author Ville Ahti
+ * @author Johannes Miettinen
+ * @author Aleksi Haapsaari
+ *<p>Toimii summauspalvelimena. Laskee yhteen palvelimelta saatuja kokonaislukuja. </p>
+ * 
  */
 public class SumServer extends Observable implements ISumServer {
 	
@@ -24,9 +27,10 @@ public class SumServer extends Observable implements ISumServer {
 	private Socket socket;
 	
 	/**
-	 * @param id
-	 * @param port
-	 * @param creator
+	 * @param id (Summauspalvelimen yksilölloinen tunnus.)
+	 * @param port (Portin numero, jota summain kuuntelee.)
+	 * @param creator (SumServerin luonut olio.)
+	 * <p>Konstruktori </p>
 	 */
 	public SumServer(int id, int port, Observer creator) {
 		this.sum = 0;
@@ -91,9 +95,10 @@ public class SumServer extends Observable implements ISumServer {
 	
 	
 	/**
-	 * @param oIn
-	 * @return
-	 * @throws IOException
+	 * @param oIn (Sisään tuleva oliovirta)
+	 * @return	Palauttaa arvon 0, kun suoritus päättyy.
+	 * @throws IOException 
+	 * <p>Käsittelee palvelimelta saatuja pyyntöjä. </p>
 	 */
 	private int handleRequests(ObjectInputStream oIn) throws IOException {
 		int gottenNumber;
@@ -120,7 +125,8 @@ public class SumServer extends Observable implements ISumServer {
 	}
 		
 	/**
-	 * @param num
+	 * @param num (Luku jolla summaa kasvatetaan.)
+	 * <p> Kasvattaa summaimen summaa saadulla kokonaisluvulla. </p>
 	 */
 	private void increaseSum(int num) {
 		if(num == 0) return; //ei lis�t� nollaa
