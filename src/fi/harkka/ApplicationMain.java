@@ -11,7 +11,7 @@ import fi.harkka.exception.ConnectionFailedException;
  * @author Aleksi
  * @author Johannes
  *
- * P‰‰luokka, jossa main-metodi.
+ * Main class with main method.
  */
 public class ApplicationMain {
 	
