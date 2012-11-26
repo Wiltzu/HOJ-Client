@@ -6,6 +6,10 @@ import fi.harkka.exception.ConnectionFailedException;
 
 
 
+/**
+ * @author Ville
+ *
+ */
 public class ApplicationMain {
 	
 	private static final int SERVERPORT = 3126;

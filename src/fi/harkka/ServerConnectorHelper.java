@@ -16,9 +16,21 @@ import java.net.UnknownHostException;
 
 import fi.harkka.exception.ConnectionFailedException;
 
+/**
+ * @author Ville
+ *
+ */
 public class ServerConnectorHelper {
 	
 	
+	/**
+	 * @param serverAddress
+	 * @param serverPort
+	 * @param timeout
+	 * @param ownPort
+	 * @return
+	 * @throws ConnectionFailedException
+	 */
 	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) throws ConnectionFailedException {
 		
 		boolean UDPSendSuccess = sendUDPPackage(serverAddress, serverPort, ownPort);
@@ -56,6 +68,12 @@ public class ServerConnectorHelper {
 		return socket;
 	}
 	//odotetaan yhteyttä johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
+	/**
+	 * @param ownPort
+	 * @param timeout
+	 * @return
+	 * @throws IOException
+	 */
 	public Socket waitTCPConnection(int ownPort, int timeout) throws IOException {
 		ServerSocket serverSocket;
 		Socket socket = null;
@@ -74,17 +92,33 @@ public class ServerConnectorHelper {
 	}
 	
 	//socketin ulosmenevä oliovirta
+	/**
+	 * @param socket
+	 * @return
+	 * @throws IOException
+	 */
 	public ObjectOutputStream getSocketsObjectOutputStream(Socket socket) throws IOException {
 		OutputStream os = socket.getOutputStream();
 		return new ObjectOutputStream(os);
 	}
 	
 	//socketiin tuleva oliovirta
+	/**
+	 * @param socket
+	 * @return
+	 * @throws IOException
+	 */
 	public ObjectInputStream getSocketsObjectInputStream(Socket socket) throws IOException {
 		InputStream is = socket.getInputStream();
 		return new ObjectInputStream(is);
 	}
 	
+	/**
+	 * @param serverAddress
+	 * @param serverPort
+	 * @param ownPort
+	 * @return
+	 */
 	private static boolean sendUDPPackage(String serverAddress, int serverPort, int ownPort) {
 		InetAddress laddr;
 		DatagramSocket socket;

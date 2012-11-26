@@ -9,6 +9,14 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * @author Ville
+ *
+ */
+/**
+ * @author Ville
+ *
+ */
 public class SumServerHandler implements Runnable, Observer {
 
 
@@ -19,7 +27,7 @@ public class SumServerHandler implements Runnable, Observer {
 	private volatile int[] sumServerValues;
 	private volatile int countOfGottenValues;
 	private volatile int sumServersTotalValue;
-	private boolean verboseMode = false;
+	private boolean verboseMode = true;
 	
 	private static final int[] PORT_NUMBERS = {3128, 3129, 3130, 3131, 3132, 3133, 3134, 3135, 3136, 3137}; 
 	
@@ -64,6 +72,9 @@ public class SumServerHandler implements Runnable, Observer {
 		
 	}
 
+	/**
+	 * @throws IOException
+	 */
 	private void handleIncomingRequests() throws IOException {
 		int gottenTaskNumber = -1; //alustetaan jollain luvulla, mikä ei ole nolla
 		do {
@@ -97,6 +108,10 @@ public class SumServerHandler implements Runnable, Observer {
 		while(gottenTaskNumber != 0);
 	}
 
+	/**
+	 * @param sumServerPorts
+	 * @throws IOException
+	 */
 	private void sendSumServerPorts(int[] sumServerPorts) throws IOException {
 		for(int i = 0; i < sumServerPorts.length; i++) {
 			oOut.writeInt(sumServerPorts[i]); //kirjoitetaan summauspalvelimien portit virtaan
@@ -104,6 +119,9 @@ public class SumServerHandler implements Runnable, Observer {
 		}
 	}
 	
+	/**
+	 * @throws IOException
+	 */
 	private void close() throws IOException {
 		oOut.close();
 		oIn.close();
@@ -126,22 +144,37 @@ public class SumServerHandler implements Runnable, Observer {
 		
 	}
 
+	/**
+	 * @param sumServersValue
+	 * @param sumServersId
+	 */
 	private synchronized void setSumServerValue(int sumServersValue, int sumServersId) {
 		sumServerValues[sumServersId] = sumServersValue; //asetetaan arvo listaan
 		
 		increaseCountOfGottenValues(); //kasvatetaan saatujen arvojen lukumäärää
 	}
 
+	/**
+	 * 
+	 */
 	private synchronized void increaseCountOfGottenValues() {
 		countOfGottenValues++;
 	}
-
+	
+	
+	/**
+	 * @return
+	 */
 	public int getCountOfGottenValues() {
 		if(verboseMode) 
 			System.out.println("Arvojen kokonaismäärä on " + countOfGottenValues);
 		return countOfGottenValues;
 	}
-
+	
+	
+	/**
+	 * @return
+	 */
 	public int getSumServersTotalValue() {
 		sumServersTotalValue = 0;
 		for(int i : sumServerValues) {
@@ -151,6 +184,11 @@ public class SumServerHandler implements Runnable, Observer {
 		return sumServersTotalValue;
 	}
 
+	/**
+	 * @param taskNumber
+	 * @param oOut
+	 * @throws IOException
+	 */
 	private synchronized void doTask(int taskNumber, ObjectOutputStream oOut) throws IOException{
 		switch (taskNumber) {
 		case 0:
@@ -173,6 +211,9 @@ public class SumServerHandler implements Runnable, Observer {
 		}
 	}
 	
+	/**
+	 * @return
+	 */
 	private int getSumServerIdWithGreatestValue() {
 		int greatestId = 0;
 		for(int id = 1; id < sumServerValues.length; id++) {
@@ -187,6 +228,11 @@ public class SumServerHandler implements Runnable, Observer {
 
 	//lukee inputStreamista palvelimen kertoman summauspalvelimien määrän
 	//virhe tulee jos yhteys on poikki
+	/**
+	 * @param oIn
+	 * @return
+	 * @throws IOException
+	 */
 	private int getNumberOfSumServers(ObjectInputStream oIn) throws IOException {
 		int timeTaken = 0;
 		int numberOfAddingServers = 0;
@@ -209,7 +255,13 @@ public class SumServerHandler implements Runnable, Observer {
 		return numberOfAddingServers;
 	}
 	
-	//luo summaus palvelimet ja palauttaa niiden porttinumerot listana
+	//
+	/**
+	 * <p>Luo summaus palvelimet ja palauttaa niiden porttinumerot listana.</p>
+	 * 
+	 * @param numOfServers
+	 * @return Lista luotujen summauspalvelimien porteista.
+	 */
 	private int[] createSumServers(int numOfServers) {
 		
 		sumServerValues = new int[numOfServers];

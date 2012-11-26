@@ -3,25 +3,40 @@ package fi.harkka;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Observable;
 import java.util.Observer;
 
+
+
+/**
+ * @author Ville Ahti, Johannes Miettinen, Aleksi Haapsaari
+ *
+ */
 public class SumServer extends Observable implements ISumServer {
 	
 	private volatile int sum;
 	private int port;
 	private int id;
 	
+	
+	/**
+	 * @param id
+	 * @param port
+	 * @param creator
+	 */
 	public SumServer(int id, int port, Observer creator) {
 		this.sum = 0;
 		this.id = id;
 		this.port = port;
 		this.addObserver(creator); //lis‰t‰‰n luoja (SumServerHandler) tarkkailijaksi
 	}
-
+	
+	
+	/* (non-Javadoc)
+	 * @see fi.harkka.ISumServer#getPort()
+	 */
 	@Override
 	public int getPort() {
 		return port;
@@ -61,6 +76,12 @@ public class SumServer extends Observable implements ISumServer {
 		}
 	}
 	
+	
+	/**
+	 * @param oIn
+	 * @return
+	 * @throws IOException
+	 */
 	private int handleRequests(ObjectInputStream oIn) throws IOException {
 		int gottenNumber = 1;
 		try {
@@ -83,6 +104,9 @@ public class SumServer extends Observable implements ISumServer {
 		return 0;
 	}
 		
+	/**
+	 * @param num
+	 */
 	private void increaseSum(int num) {
 		if(num == 0) return; //ei lis‰t‰ nollaa
 		this.sum += num;
