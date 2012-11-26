@@ -67,7 +67,7 @@ public class ServerConnectorHelper {
 		
 		return socket;
 	}
-	//odotetaan yhteyttä johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
+	//odotetaan yhteyttï¿½ johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
 	/**
 	 * @param ownPort
 	 * @param timeout
@@ -91,7 +91,7 @@ public class ServerConnectorHelper {
 		return socket;
 	}
 	
-	//socketin ulosmenevä oliovirta
+	//socketin ulosmenevï¿½ oliovirta
 	/**
 	 * @param socket
 	 * @return
