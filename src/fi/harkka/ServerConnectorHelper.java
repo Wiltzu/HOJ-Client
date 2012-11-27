@@ -17,19 +17,29 @@ import java.net.UnknownHostException;
 import fi.harkka.exception.ConnectionFailedException;
 
 /**
- * @author Ville
+ * <p>Hoitaa yhteyksien ja oliovirtojen luonnit palvelimen Y kanssa.</p>
+ * 
+ * @author Ville Ahti
+ * @author Johannes Miettinen
+ * @author Aleksi Haapsaari
  *
+ * 
  */
 public class ServerConnectorHelper {
 	
+	private static final boolean verboseMode = false;
+	
 	
 	/**
-	 * @param serverAddress
-	 * @param serverPort
-	 * @param timeout
-	 * @param ownPort
-	 * @return
-	 * @throws ConnectionFailedException
+	 * 
+	 * <p>Luo yhteyden palvelimeen Y.</p>
+	 * @param serverAddress palvelimen URL-osoite
+	 * @param serverPort palvelimen portti
+	 * @param timeout aikaraja yhteydenotolle
+	 * @param ownPort yhdistävän sovelluksen oma portti
+	 * @return Socket-yhteys palvelimeen
+	 * @throws ConnectionFailedException jos yhteydenotto määrätyssä aikarajassa epäonnistuu.
+	 * 
 	 */
 	public static Socket connectToServer(String serverAddress,  int serverPort, int timeout, int ownPort) throws ConnectionFailedException {
 		
@@ -47,7 +57,9 @@ public class ServerConnectorHelper {
 				
 				
 					try {
-						System.out.println("Trying to make TCP connection");
+						if(verboseMode)
+							System.out.println("Trying to make TCP connection");
+						
 						socket = connectorHelper.waitTCPConnection(ownPort, timeout);
 						if(socket != null) //jos socketti saatiin lopetetaan silmukka
 							TCPSuccess = true;
@@ -55,8 +67,7 @@ public class ServerConnectorHelper {
 							UDPSendSuccess = false;
 					//ei saatu sockettia, UDP-paketti uusiksi!
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						System.err.println("Something strange happened!");
+						e.printStackTrace();
 					}
 			}
 			else {
@@ -67,12 +78,15 @@ public class ServerConnectorHelper {
 		
 		return socket;
 	}
-	//odotetaan yhteytt� johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten
+
+	
 	/**
-	 * @param ownPort
-	 * @param timeout
-	 * @return
-	 * @throws IOException
+	 * <p>Odottaa yhteyttä johonkin porttiin ja palautetaan lopuksi Socket kommunikaatiota varten</p>
+	 * 
+	 * @param ownPort omaportti, johon yhteyttä odotetaan
+	 * @param timeout aikaraja odotukselle, 0 on rajaton
+	 * @return saatu socket-yhteys
+	 * @throws IOException jos tulee virhe yrittäessä ottaa yhteyttä.
 	 */
 	public Socket waitTCPConnection(int ownPort, int timeout) throws IOException {
 		ServerSocket serverSocket;
@@ -85,17 +99,17 @@ public class ServerConnectorHelper {
 		}
 		catch (SocketTimeoutException e) {
 			serverSocket.close();
-			System.err.println("TimeOut while making TCP connection");
+			if(verboseMode)
+				System.err.println("TimeOut while making TCP connection");
 		}
 		serverSocket.close();
 		return socket;
 	}
 	
-	//socketin ulosmenev� oliovirta
 	/**
-	 * @param socket
-	 * @return
-	 * @throws IOException
+	 * @param socket socket, jonka ulosmeneväoliovirta halutaan 
+	 * @return Socketin ulosmenevä oliovirta
+	 * @throws IOException jos oliovirranluonnissa tulee virhe
 	 */
 	public ObjectOutputStream getSocketsObjectOutputStream(Socket socket) throws IOException {
 		OutputStream os = socket.getOutputStream();
@@ -104,9 +118,9 @@ public class ServerConnectorHelper {
 	
 	//socketiin tuleva oliovirta
 	/**
-	 * @param socket
-	 * @return
-	 * @throws IOException
+	 * @param socket socket, jonka sisääntulevaoliovirta halutaan 
+	 * @return Socketin sisääntuleva oliovirta.
+	 * @throws IOException jos oliovirranluonnissa tulee virhe
 	 */
 	public ObjectInputStream getSocketsObjectInputStream(Socket socket) throws IOException {
 		InputStream is = socket.getInputStream();
@@ -114,10 +128,12 @@ public class ServerConnectorHelper {
 	}
 	
 	/**
-	 * @param serverAddress
-	 * @param serverPort
-	 * @param ownPort
-	 * @return
+	 * <p>Lähettää UDP-paketin haluttuun osoitteeseen, joka sisältää oman portin.</p>
+	 * 
+	 * @param serverAddress koneen URL-osoite, johon paketti halutaan lähettää.
+	 * @param serverPort koneen portti, johon paketti halutaan lähettää.
+	 * @param ownPort oma portti, joka lähetetään tietona.
+	 * @return totuusarvo siitä, onnistuiko lähetys.
 	 */
 	private static boolean sendUDPPackage(String serverAddress, int serverPort, int ownPort) {
 		InetAddress laddr;

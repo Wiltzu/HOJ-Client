@@ -11,11 +11,14 @@ import java.util.Observer;
 
 
 /**
+ * <p>Toimii summauspalvelimena. Laskee yhteen palvelimelta saatuja kokonaislukuja. </p>
+ * 
  * @author Ville Ahti
  * @author Johannes Miettinen
  * @author Aleksi Haapsaari
- *<p>Toimii summauspalvelimena. Laskee yhteen palvelimelta saatuja kokonaislukuja. </p>
- * 
+ *
+ *@see ISumServer
+ *@see SumServerHandler 
  */
 public class SumServer extends Observable implements ISumServer {
 	
@@ -27,24 +30,22 @@ public class SumServer extends Observable implements ISumServer {
 	private Socket socket;
 	
 	/**
-	 * @param id (Summauspalvelimen yksilölloinen tunnus.)
-	 * @param port (Portin numero, jota summain kuuntelee.)
-	 * @param creator (SumServerin luonut olio.)
-	 * <p>Konstruktori </p>
+	 * <p>Konstruktori</p>
+	 * 
+	 * @param id summauspalvelimen yksilölloinen tunnus.
+	 * @param port portin numero, jota summain kuuntelee.
+	 * @param observer SumServeriä tarkkaileva olio.
+	 * 
 	 */
-	public SumServer(int id, int port, Observer creator) {
+	public SumServer(int id, int port, Observer observer) {
 		this.sum = 0;
 		this.id = id;
 		this.port = port;
-		this.addObserver(creator); //lis�t��n luoja (SumServerHandler) tarkkailijaksi
+		this.addObserver(observer); //lisätään luoja (SumServerHandler) tarkkailijaksi
 		this.connectionClosed = false;
 		
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see fi.harkka.ISumServer#getPort()
-	 */
 	@Override
 	public int getPort() {
 		return port;
@@ -95,10 +96,12 @@ public class SumServer extends Observable implements ISumServer {
 	
 	
 	/**
-	 * @param oIn (Sisään tuleva oliovirta)
+	 * <p>Käsittelee palvelimelta saatuja pyyntöjä sisääntulevasta oliovirrasta.</p>
+	 * 
+	 * @param oIn sisääntuleva oliovirta
 	 * @return	Palauttaa arvon 0, kun suoritus päättyy.
-	 * @throws IOException 
-	 * <p>Käsittelee palvelimelta saatuja pyyntöjä. </p>
+	 * @throws IOException jos yhteydessä tapahtuu jokin virhe.
+	 * 
 	 */
 	private int handleRequests(ObjectInputStream oIn) throws IOException {
 		int gottenNumber;
@@ -125,8 +128,10 @@ public class SumServer extends Observable implements ISumServer {
 	}
 		
 	/**
-	 * @param num (Luku jolla summaa kasvatetaan.)
-	 * <p> Kasvattaa summaimen summaa saadulla kokonaisluvulla. </p>
+	 * <p>Kasvattaa summaimen summaa saadulla kokonaisluvulla.</p>
+	 * 
+	 * @param num luku, jolla summaa kasvatetaan.
+	 * 
 	 */
 	private void increaseSum(int num) {
 		if(num == 0) return; //ei lis�t� nollaa
